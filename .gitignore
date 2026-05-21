@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Node / Frontend
+node_modules/
+.next/
+.nuxt/
+dist/
+build/
+.vite/
+*.local
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+.docker/
+
+# Alembic — миграции коммитим, кэш нет
+**/alembic.ini.bak
+
+# Логи
+*.log
+logs/
+
+# Локальные выгрузки/экспорты
+exports/
+tmp/
