@@ -42,12 +42,12 @@ make ps
 
 | Сервис | Адрес |
 |---|---|
-| Frontend (Refine UI) | http://localhost:5173 |
+| Frontend (Refine UI) | http://localhost:5181 |
 | Backend API | http://localhost:8000 |
 | OpenAPI docs | http://localhost:8000/docs |
 | Postgres | localhost:5432 (user `statops` / db `statops`) |
 
-Откройте http://localhost:5173, зарегистрируйтесь и начинайте работу.
+Откройте http://localhost:5181, зарегистрируйтесь и начинайте работу.
 
 ## Технический стек
 

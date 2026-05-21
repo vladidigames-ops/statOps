@@ -3,7 +3,6 @@ import { Notifications } from "@mantine/notifications";
 import { Authenticated, Refine } from "@refinedev/core";
 import {
   ErrorComponent,
-  RefineThemes,
   ThemedLayoutV2,
   notificationProvider as mantineNotificationProvider,
 } from "@refinedev/mantine";
@@ -17,6 +16,7 @@ import { IconBuildingStore, IconDashboard, IconPlugConnected } from "@tabler/ico
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 
 import { DashboardPage } from "@/pages/dashboard";
+import { theme } from "@/theme";
 import { EstablishmentCreatePage } from "@/pages/establishments/create";
 import { EstablishmentEditPage } from "@/pages/establishments/edit";
 import { EstablishmentListPage } from "@/pages/establishments/list";
@@ -31,7 +31,7 @@ import { dataProvider } from "@/providers/dataProvider";
 export default function App() {
   return (
     <BrowserRouter>
-      <MantineProvider theme={RefineThemes.Blue as never} defaultColorScheme="auto">
+      <MantineProvider theme={theme} defaultColorScheme="dark">
         <Notifications />
         <Refine
           dataProvider={dataProvider}
@@ -110,9 +110,50 @@ export default function App() {
 }
 
 function Brand({ collapsed }: { collapsed: boolean }) {
+  if (collapsed) {
+    return (
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 10,
+          background: "var(--mantine-color-emerald-6)",
+          color: "#0a1316",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 800,
+          fontSize: 16,
+        }}
+      >
+        sO
+      </div>
+    );
+  }
   return (
-    <span style={{ fontWeight: 700, fontSize: 18 }}>
-      {collapsed ? "sO" : "statOps"}
-    </span>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 10,
+          background: "var(--mantine-color-emerald-6)",
+          color: "#0a1316",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 800,
+          fontSize: 16,
+        }}
+      >
+        sO
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.1 }}>
+        <span style={{ fontWeight: 700, fontSize: 16 }}>statOps</span>
+        <span style={{ fontSize: 11, color: "var(--mantine-color-dimmed)" }}>
+          Аналитика общепита
+        </span>
+      </div>
+    </div>
   );
 }

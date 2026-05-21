@@ -33,7 +33,7 @@ class Settings(BaseSettings):
         default="dev-only-change-in-prod-dev-only-change-in-prod-32b="
     )
 
-    cors_allow_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+    cors_allow_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5181"])
 
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 
