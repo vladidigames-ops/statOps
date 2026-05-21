@@ -27,6 +27,7 @@ dist/
 build/
 .vite/
 *.local
+*.tsbuildinfo
 
 # Env / secrets
 .env

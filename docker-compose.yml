@@ -1,0 +1,102 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-statops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-statops}
+      POSTGRES_DB: ${POSTGRES_DB:-statops}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-statops}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    environment:
+      ENV: dev
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-statops}:${POSTGRES_PASSWORD:-statops}@postgres:5432/${POSTGRES_DB:-statops}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-replace-me-and-make-it-long-please}
+      CREDENTIALS_ENCRYPTION_KEY: ${CREDENTIALS_ENCRYPTION_KEY}
+      CORS_ALLOW_ORIGINS: '["http://localhost:5173"]'
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  worker:
+    build:
+      context: ./backend
+    environment:
+      ENV: dev
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-statops}:${POSTGRES_PASSWORD:-statops}@postgres:5432/${POSTGRES_DB:-statops}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-replace-me-and-make-it-long-please}
+      CREDENTIALS_ENCRYPTION_KEY: ${CREDENTIALS_ENCRYPTION_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: ["celery", "-A", "app.workers", "worker", "--loglevel=info"]
+    profiles: ["workers"]
+
+  beat:
+    build:
+      context: ./backend
+    environment:
+      ENV: dev
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-statops}:${POSTGRES_PASSWORD:-statops}@postgres:5432/${POSTGRES_DB:-statops}
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-dev-secret-replace-me-and-make-it-long-please}
+      CREDENTIALS_ENCRYPTION_KEY: ${CREDENTIALS_ENCRYPTION_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: ["celery", "-A", "app.workers", "beat", "--loglevel=info"]
+    profiles: ["workers"]
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      VITE_API_PROXY_TARGET: http://api:8000
+    depends_on:
+      - api
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
